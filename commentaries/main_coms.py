@@ -8,10 +8,12 @@ main.py: графический интерфейс программы
 
 """
 #импортируем нужные библиотеки
+import os
 import getfile
 import threading
 import tkinter as tk
 from tkinter import ttk, messagebox
+from requests.exceptions import ConnectionError
 
 #функция поиска книг
 def getvalues():
@@ -41,6 +43,7 @@ def update_progress(total_size, bytes_read):
 
     if bytes_read >= total_size: #когда размер скачанного сравняется с полным размером файла
         messagebox.showinfo('Book Downloader', 'Скачивание книги завершено') #выдаем сообщение об успешном скачивании
+        os.startfile(os.getcwd() + '/downloads') #открываем папку со скачанным файлом
 
 #функция скачивания
 def download():
@@ -50,8 +53,12 @@ def download():
             downloadbtn.configure(state='disabled') #временно выключаем кнопку скачивания
             getfile.send(CHOOSED, update_progress) #скачиваем файл (см. getfile.py)
             downloadbtn.configure(state='enabled') #после скачивания обратно включаем кнопку
-        except: #при возникновении ошибки (чаще всего отсутствие интернета)
-            messagebox.showerror('ERROR!', 'Нет подключения к интернету!') #выдаем сообщение об ошибке
+        except ConnectionError: #при отсутствии интернета
+            messagebox.showerror('ERROR!', 'Нет подключения к интернету!') #выдаем сообщение об этом
+            downloadbtn.configure(state='enabled') #обратно включаем кнопку
+        except IndexError: #если не найдена книга
+            messagebox.showerror('ERROR!', 'Выберите существующий учебник') #выдаем сообщение об этом
+            downloadbtn.configure(state='enabled') #обратно включаем кнопку
 
 
 #функции запуска потоков

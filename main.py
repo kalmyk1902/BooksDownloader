@@ -1,7 +1,9 @@
+import os
 import getfile
 import threading
 import tkinter as tk
 from tkinter import ttk, messagebox
+from requests.exceptions import ConnectionError
 
 def getvalues():
     lis = getfile.pdf(char.get(), form.get())
@@ -28,6 +30,7 @@ def update_progress(total_size, bytes_read):
 
     if bytes_read >= total_size:
         messagebox.showinfo('Book Downloader', 'Скачивание книги завершено')
+        os.startfile(os.getcwd() + '/downloads')
 
 def download():
     CHOOSED = choose.get()
@@ -36,8 +39,12 @@ def download():
             downloadbtn.configure(state='disabled')
             getfile.send(CHOOSED, update_progress)
             downloadbtn.configure(state='enabled')
-        except:
+        except ConnectionError:
             messagebox.showerror('ERROR!', 'Нет подключения к интернету!')
+            downloadbtn.configure(state='enabled')
+        except IndexError:
+            messagebox.showerror('ERROR!', 'Выберите существующий учебник')
+            downloadbtn.configure(state='enabled')
 
 
 def start_get():
